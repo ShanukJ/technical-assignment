@@ -19,6 +19,7 @@ import Typography from "@mui/material/Typography";
 import { blue } from "@mui/material/colors";
 import moment from "moment";
 import Icon from "@mui/material/Icon";
+import Collapse from "@mui/material/Collapse";
 
 import tableData from "../data/data";
 import { COLORS } from "../utils/colors";
@@ -103,6 +104,93 @@ function TablePaginationActions(props) {
   );
 }
 
+const ExpandableTableRow = ({
+  children,
+  expandComponent,
+  data,
+  ...otherProps
+}) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  console.log("Jaye" + JSON.stringify(data));
+
+  return (
+    <React.Fragment>
+      <TableRow
+        sx={{ "& > *": { borderBottom: "unset" } }}
+        {...otherProps}
+        hover
+        style={{ cursor: "pointer" }}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {children}
+      </TableRow>
+      {isExpanded && (
+        <TableRow>
+          <TableCell style={{ paddingBottom: 10, paddingTop: 10 }} colSpan={6}>
+            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                {/* <Typography variant="h6" gutterBottom component="div">
+                History
+              </Typography> */}
+                <Table size="small" aria-label="collapse">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="left">
+                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                          Status
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">
+                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                          Queued
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">
+                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                          Started
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">
+                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                          Ended
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                          Duration
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow key={data.id}>
+                      <TableCell align="left">
+                        {data.jobStatus && data.jobStatus === "Completed" ? (
+                          <SuccessTextTypography>
+                            {data.jobStatus}
+                          </SuccessTextTypography>
+                        ) : (
+                          <ErrorTextTypography>
+                            {data.jobStatus}
+                          </ErrorTextTypography>
+                        )}
+                      </TableCell>
+                      <TableCell align="left">{data.queuedTime}</TableCell>
+                      <TableCell align="left">{data.startTime}</TableCell>
+                      <TableCell align="left">{data.endTime}</TableCell>
+                      <TableCell align="right">{data.duration}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      )}
+    </React.Fragment>
+  );
+};
+
 export default function MuiTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -150,57 +238,68 @@ export default function MuiTable() {
               )
             : tableData
           ).map((row) => (
-            <TableRow key={row.id}>
-              <TableCell style={{ width: 10 }} align="left">
-                {" "}
-                {row.jobStatus && row.jobStatus === "Completed" ? (
-                  <Icon color="success">check_circle</Icon>
-                ) : (
-                  <Icon color="error">error</Icon>
-                )}{" "}
-              </TableCell>
-              <TableCell style={{ width: 10 }} align="left">
-                {" "}
-                {row.jobStatus && row.jobStatus === "Completed" ? (
-                  <Icon sx={{ color: blue[500] }}>folder</Icon>
-                ) : (
-                  <Icon color="error">folder</Icon>
-                )}{" "}
-              </TableCell>
-              <TableCell align="left">
-                {row.jobStatus && row.jobStatus === "Completed" ? (
-                  <SuccessTextTypography>
-                    {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
-                  </SuccessTextTypography>
-                ) : (
-                  <ErrorTextTypography>
-                    {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
-                  </ErrorTextTypography>
-                )}
-              </TableCell>
-              <TableCell style={{ width: 200 }} align="right">
-                {row.owner && row.jobStatus === "Completed" ? (
-                  <SuccessTextTypography> {row.owner}</SuccessTextTypography>
-                ) : (
-                  <ErrorTextTypography> {row.owner}</ErrorTextTypography>
-                )}
-              </TableCell>
-              <TableCell style={{ width: 200 }} align="right">
-                {row.owner && row.jobStatus === "Completed" ? (
-                  <SuccessTextTypography display="inline">
-                    {row.jobStatus}
-                    <NormalTextTypography display="inline">{" on "}</NormalTextTypography>
-                    {moment(row.endTime).format("MMM D")}
-                  </SuccessTextTypography>
-                ) : (
-                  <ErrorTextTypography display="inline">
-                    {row.jobStatus}
-                    <NormalTextTypography display="inline">{" on "}</NormalTextTypography>
-                    {moment(row.endTime).format("MMM D")}
-                  </ErrorTextTypography>
-                )}
-              </TableCell>
-            </TableRow>
+            <>
+              <ExpandableTableRow key={row.id} data={row}>
+                <TableRow key={row.id}>
+                  <TableCell style={{ width: 10 }} align="left">
+                    {" "}
+                    {row.jobStatus && row.jobStatus === "Completed" ? (
+                      <Icon color="success">check_circle</Icon>
+                    ) : (
+                      <Icon color="error">error</Icon>
+                    )}{" "}
+                  </TableCell>
+                  <TableCell style={{ width: 10 }} align="left">
+                    {" "}
+                    {row.jobStatus && row.jobStatus === "Completed" ? (
+                      <Icon sx={{ color: blue[500] }}>folder</Icon>
+                    ) : (
+                      <Icon color="error">folder</Icon>
+                    )}{" "}
+                  </TableCell>
+                  <TableCell style={{ width: 200 }} align="left">
+                    {row.jobStatus && row.jobStatus === "Completed" ? (
+                      <SuccessTextTypography>
+                        {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
+                      </SuccessTextTypography>
+                    ) : (
+                      <ErrorTextTypography>
+                        {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
+                      </ErrorTextTypography>
+                    )}
+                  </TableCell>
+                  <TableCell style={{ width: 800 }} align="right">
+                    {row.owner && row.jobStatus === "Completed" ? (
+                      <SuccessTextTypography>
+                        {" "}
+                        {row.owner}
+                      </SuccessTextTypography>
+                    ) : (
+                      <ErrorTextTypography> {row.owner}</ErrorTextTypography>
+                    )}
+                  </TableCell>
+                  <TableCell style={{ width: 200 }} align="right">
+                    {row.owner && row.jobStatus === "Completed" ? (
+                      <SuccessTextTypography display="inline">
+                        {row.jobStatus}
+                        <NormalTextTypography display="inline">
+                          {" on "}
+                        </NormalTextTypography>
+                        {moment(row.endTime).format("MMM D")}
+                      </SuccessTextTypography>
+                    ) : (
+                      <ErrorTextTypography display="inline">
+                        {row.jobStatus}
+                        <NormalTextTypography display="inline">
+                          {" on "}
+                        </NormalTextTypography>
+                        {moment(row.endTime).format("MMM D")}
+                      </ErrorTextTypography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              </ExpandableTableRow>
+            </>
           ))}
 
           {emptyRows > 0 && (
