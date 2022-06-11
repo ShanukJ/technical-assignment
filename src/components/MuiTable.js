@@ -111,7 +111,6 @@ const ExpandableTableRow = ({
   ...otherProps
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
-  console.log("Jaye" + JSON.stringify(data));
 
   return (
     <React.Fragment>
@@ -136,27 +135,27 @@ const ExpandableTableRow = ({
                   <TableHead>
                     <TableRow>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                        <Typography sx={{ fontWeight: "bold"}}>
                           Status
                         </Typography>
                       </TableCell>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                        <Typography sx={{ fontWeight: "bold"}}>
                           Queued
                         </Typography>
                       </TableCell>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                        <Typography sx={{ fontWeight: "bold"}}>
                           Started
                         </Typography>
                       </TableCell>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                        <Typography sx={{ fontWeight: "bold"}}>
                           Ended
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
-                        <Typography sx={{ fontWeight: "bold", m: 1 }}>
+                        <Typography sx={{ fontWeight: "bold"}}>
                           Duration
                         </Typography>
                       </TableCell>
