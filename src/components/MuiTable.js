@@ -14,7 +14,32 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
+import { withStyles } from "@material-ui/core/styles";
+import Typography from "@mui/material/Typography";
+import { blue } from "@mui/material/colors";
+import moment from "moment";
+import Icon from "@mui/material/Icon";
+
 import tableData from "../data/data";
+import { COLORS } from "../utils/colors";
+
+const ErrorTextTypography = withStyles({
+  root: {
+    color: COLORS.error,
+  },
+})(Typography);
+
+const SuccessTextTypography = withStyles({
+  root: {
+    color: COLORS.blue,
+  },
+})(Typography);
+
+const NormalTextTypography = withStyles({
+  root: {
+    color: COLORS.black,
+  },
+})(Typography);
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -126,16 +151,54 @@ export default function MuiTable() {
             : tableData
           ).map((row) => (
             <TableRow key={row.id}>
-              <TableCell align="left" component="th" scope="row"></TableCell>
-              <TableCell align="left" component="th" scope="row"></TableCell>
-              <TableCell align="left" component="th" scope="row">
-                {row.queuedTime}
+              <TableCell style={{ width: 10 }} align="left">
+                {" "}
+                {row.jobStatus && row.jobStatus === "Completed" ? (
+                  <Icon color="success">check_circle</Icon>
+                ) : (
+                  <Icon color="error">error</Icon>
+                )}{" "}
               </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {row.owner}
+              <TableCell style={{ width: 10 }} align="left">
+                {" "}
+                {row.jobStatus && row.jobStatus === "Completed" ? (
+                  <Icon sx={{ color: blue[500] }}>folder</Icon>
+                ) : (
+                  <Icon color="error">folder</Icon>
+                )}{" "}
               </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {row.jobStatus + " on " + row.endTime}
+              <TableCell align="left">
+                {row.jobStatus && row.jobStatus === "Completed" ? (
+                  <SuccessTextTypography>
+                    {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
+                  </SuccessTextTypography>
+                ) : (
+                  <ErrorTextTypography>
+                    {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
+                  </ErrorTextTypography>
+                )}
+              </TableCell>
+              <TableCell style={{ width: 200 }} align="right">
+                {row.owner && row.jobStatus === "Completed" ? (
+                  <SuccessTextTypography> {row.owner}</SuccessTextTypography>
+                ) : (
+                  <ErrorTextTypography> {row.owner}</ErrorTextTypography>
+                )}
+              </TableCell>
+              <TableCell style={{ width: 200 }} align="right">
+                {row.owner && row.jobStatus === "Completed" ? (
+                  <SuccessTextTypography display="inline">
+                    {row.jobStatus}
+                    <NormalTextTypography display="inline">{" on "}</NormalTextTypography>
+                    {moment(row.endTime).format("MMM D")}
+                  </SuccessTextTypography>
+                ) : (
+                  <ErrorTextTypography display="inline">
+                    {row.jobStatus}
+                    <NormalTextTypography display="inline">{" on "}</NormalTextTypography>
+                    {moment(row.endTime).format("MMM D")}
+                  </ErrorTextTypography>
+                )}
               </TableCell>
             </TableRow>
           ))}
