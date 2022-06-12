@@ -20,6 +20,10 @@ import { blue } from "@mui/material/colors";
 import moment from "moment";
 import Icon from "@mui/material/Icon";
 import Collapse from "@mui/material/Collapse";
+import Stack from "@mui/material/Stack";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import Divider from "@mui/material/Divider";
+import SearchBar from "material-ui-search-bar";
 
 import tableData from "../data/data";
 import { COLORS } from "../utils/colors";
@@ -128,34 +132,63 @@ const ExpandableTableRow = ({
           <TableCell style={{ paddingBottom: 10, paddingTop: 10 }} colSpan={6}>
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
               <Box sx={{ margin: 1 }}>
-                {/* <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography> */}
+                <div
+                  style={{
+                    padding: 10 + "px",
+                    borderRadius: 5 + "px",
+                    minHeight: 20 + "px",
+                    backgroundColor: COLORS.gray,
+                  }}
+                >
+                  <SuccessTextTypography display="inline">
+                    {"Files"}
+                    {" / "}
+                    {data.name}
+                  </SuccessTextTypography>
+                </div>
+
+                <div style={{ padding: 10 }}>
+                  <Stack direction="row" alignItems="center" gap={0.5}>
+                    <RocketLaunchIcon />
+                    <SuccessTextTypography display="inline">
+                      <NormalTextTypography display="inline">
+                        {"("}
+                      </NormalTextTypography>
+                      {data.owner}
+                      <NormalTextTypography display="inline">
+                        {")"}
+                      </NormalTextTypography>
+                    </SuccessTextTypography>
+                  </Stack>
+                </div>
+
+                <Divider />
+
                 <Table size="small" aria-label="collapse">
                   <TableHead>
                     <TableRow>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold"}}>
+                        <Typography sx={{ fontWeight: "bold" }}>
                           Status
                         </Typography>
                       </TableCell>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold"}}>
+                        <Typography sx={{ fontWeight: "bold" }}>
                           Queued
                         </Typography>
                       </TableCell>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold"}}>
+                        <Typography sx={{ fontWeight: "bold" }}>
                           Started
                         </Typography>
                       </TableCell>
                       <TableCell align="left">
-                        <Typography sx={{ fontWeight: "bold"}}>
+                        <Typography sx={{ fontWeight: "bold" }}>
                           Ended
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
-                        <Typography sx={{ fontWeight: "bold"}}>
+                        <Typography sx={{ fontWeight: "bold" }}>
                           Duration
                         </Typography>
                       </TableCell>
@@ -174,10 +207,20 @@ const ExpandableTableRow = ({
                           </ErrorTextTypography>
                         )}
                       </TableCell>
-                      <TableCell align="left">{data.queuedTime}</TableCell>
-                      <TableCell align="left">{data.startTime}</TableCell>
-                      <TableCell align="left">{data.endTime}</TableCell>
-                      <TableCell align="right">{data.duration}</TableCell>
+                      <TableCell align="left">
+                        {moment(data.queuedTime).format(
+                          "DD MMM YYYY hh:mm:ss a"
+                        )}
+                      </TableCell>
+                      <TableCell align="left">
+                        {moment(data.startTime).format("hh:mm:ss a")}
+                      </TableCell>
+                      <TableCell align="left">
+                        {moment(data.endTime).format("hh:mm:ss a")}
+                      </TableCell>
+                      <TableCell align="right">
+                        {moment.duration(data.duration).asSeconds()}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -207,107 +250,121 @@ export default function MuiTable() {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-        <TableHead>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-              colSpan={5}
-              count={tableData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: {
-                  "aria-label": "rows per page",
-                },
-                native: true,
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0
-            ? tableData.slice(
-                page * rowsPerPage,
-                page * rowsPerPage + rowsPerPage
-              )
-            : tableData
-          ).map((row) => (
-            <>
-              <ExpandableTableRow key={row.id} data={row}>
-                <TableRow key={row.id}>
-                  <TableCell style={{ width: 10 }} align="left">
-                    {" "}
-                    {row.jobStatus && row.jobStatus === "Completed" ? (
-                      <Icon color="success">check_circle</Icon>
-                    ) : (
-                      <Icon color="error">error</Icon>
-                    )}{" "}
-                  </TableCell>
-                  <TableCell style={{ width: 10 }} align="left">
-                    {" "}
-                    {row.jobStatus && row.jobStatus === "Completed" ? (
-                      <Icon sx={{ color: blue[500] }}>folder</Icon>
-                    ) : (
-                      <Icon color="error">folder</Icon>
-                    )}{" "}
-                  </TableCell>
-                  <TableCell style={{ width: 200 }} align="left">
-                    {row.jobStatus && row.jobStatus === "Completed" ? (
-                      <SuccessTextTypography>
-                        {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
-                      </SuccessTextTypography>
-                    ) : (
-                      <ErrorTextTypography>
-                        {moment(row.queuedTime).format("/YYYY-MM-D hh:mm:ss")}
-                      </ErrorTextTypography>
-                    )}
-                  </TableCell>
-                  <TableCell style={{ width: 800 }} align="right">
-                    {row.owner && row.jobStatus === "Completed" ? (
-                      <SuccessTextTypography>
-                        {" "}
-                        {row.owner}
-                      </SuccessTextTypography>
-                    ) : (
-                      <ErrorTextTypography> {row.owner}</ErrorTextTypography>
-                    )}
-                  </TableCell>
-                  <TableCell style={{ width: 200 }} align="right">
-                    {row.owner && row.jobStatus === "Completed" ? (
-                      <SuccessTextTypography display="inline">
-                        {row.jobStatus}
-                        <NormalTextTypography display="inline">
-                          {" on "}
-                        </NormalTextTypography>
-                        {moment(row.endTime).format("MMM D")}
-                      </SuccessTextTypography>
-                    ) : (
-                      <ErrorTextTypography display="inline">
-                        {row.jobStatus}
-                        <NormalTextTypography display="inline">
-                          {" on "}
-                        </NormalTextTypography>
-                        {moment(row.endTime).format("MMM D")}
-                      </ErrorTextTypography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              </ExpandableTableRow>
-            </>
-          ))}
+    <>
+      
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+          <TableHead>
+            <TableCell>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+        <div>
+        <SearchBar
+          style={{
+            margin: "0",
+            maxWidth: 600,
+          }}
+        />
+        </div>
+        <div>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+          colSpan={5}
+          count={tableData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          SelectProps={{
+            inputProps: {
+              "aria-label": "rows per page",
+            },
+            native: true,
+          }}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          ActionsComponent={TablePaginationActions}
+          sx={{borderBottom: "unset" }}
+        />
+        </div>
+      </div>
+            </TableCell>
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? tableData.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )
+              : tableData
+            ).map((row) => (
+              <>
+                <ExpandableTableRow key={row.id} data={row}>
+                  <TableRow key={row.id}>
+                    <TableCell style={{ width: 10 }} align="left">
+                      {" "}
+                      {row.jobStatus && row.jobStatus === "Completed" ? (
+                        <Icon color="success">check_circle</Icon>
+                      ) : (
+                        <Icon color="error">error</Icon>
+                      )}{" "}
+                    </TableCell>
+                    <TableCell style={{ width: 10 }} align="left">
+                      {" "}
+                      {row.jobStatus && row.jobStatus === "Completed" ? (
+                        <Icon sx={{ color: blue[500] }}>folder</Icon>
+                      ) : (
+                        <Icon color="error">folder</Icon>
+                      )}{" "}
+                    </TableCell>
+                    <TableCell style={{ width: 200 }} align="left">
+                      {row.jobStatus && row.jobStatus === "Completed" ? (
+                        <SuccessTextTypography>
+                          {row.name}
+                        </SuccessTextTypography>
+                      ) : (
+                        <ErrorTextTypography>{row.name}</ErrorTextTypography>
+                      )}
+                    </TableCell>
+                    <TableCell style={{ width: 800 }} align="right">
+                      {row.owner && row.jobStatus === "Completed" ? (
+                        <SuccessTextTypography>
+                          {" "}
+                          {row.owner}
+                        </SuccessTextTypography>
+                      ) : (
+                        <ErrorTextTypography> {row.owner}</ErrorTextTypography>
+                      )}
+                    </TableCell>
+                    <TableCell style={{ width: 200 }} align="right">
+                      {row.owner && row.jobStatus === "Completed" ? (
+                        <SuccessTextTypography display="inline">
+                          {row.jobStatus}
+                          <NormalTextTypography display="inline">
+                            {" on "}
+                          </NormalTextTypography>
+                          {moment(row.endTime).format("MMM D")}
+                        </SuccessTextTypography>
+                      ) : (
+                        <ErrorTextTypography display="inline">
+                          {row.jobStatus}
+                          <NormalTextTypography display="inline">
+                            {" on "}
+                          </NormalTextTypography>
+                          {moment(row.endTime).format("MMM D")}
+                        </ErrorTextTypography>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                </ExpandableTableRow>
+              </>
+            ))}
 
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 }
