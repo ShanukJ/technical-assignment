@@ -219,7 +219,19 @@ const ExpandableTableRow = ({
                         {moment(data.endTime).format("hh:mm:ss a")}
                       </TableCell>
                       <TableCell align="right">
-                        {moment.duration(data.duration).asSeconds()}
+                        {/* {moment.duration(data.duration).asSeconds()} */}
+                        {moment(data.endTime).diff(
+                          data.startTime,
+                          "milliseconds"
+                        )}
+                        {"ms"}
+                        {" ("}
+                        {moment(data.startTime).diff(
+                          data.queuedTime,
+                          "milliseconds"
+                        )}
+                        {"ms"}
+                        {")"}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -236,9 +248,23 @@ const ExpandableTableRow = ({
 export default function MuiTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState(tableData);
+  const [searched, setSearched] = React.useState("");
+
+  const requestSearch = (searchedVal) => {
+    const filteredRows = tableData.filter((row) => {
+      return row.owner.toLowerCase().includes(searchedVal.toLowerCase());
+    });
+    setRows(filteredRows);
+  };
+
+  const cancelSearch = () => {
+    setSearched("");
+    requestSearch(searched);
+  };
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tableData.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -250,121 +276,125 @@ export default function MuiTable() {
   };
 
   return (
-    <>
-      
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-          <TableHead>
-            <TableCell>
-            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-        <div>
-        <SearchBar
-          style={{
-            margin: "0",
-            maxWidth: 600,
-          }}
-        />
-        </div>
-        <div>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-          colSpan={5}
-          count={tableData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          SelectProps={{
-            inputProps: {
-              "aria-label": "rows per page",
-            },
-            native: true,
-          }}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          ActionsComponent={TablePaginationActions}
-          sx={{borderBottom: "unset" }}
-        />
-        </div>
-      </div>
-            </TableCell>
-          </TableHead>
-          <TableBody>
-            {(rowsPerPage > 0
-              ? tableData.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-              : tableData
-            ).map((row) => (
-              <>
-                <ExpandableTableRow key={row.id} data={row}>
-                  <TableRow key={row.id}>
-                    <TableCell style={{ width: 10 }} align="left">
-                      {" "}
-                      {row.jobStatus && row.jobStatus === "Completed" ? (
-                        <Icon color="success">check_circle</Icon>
-                      ) : (
-                        <Icon color="error">error</Icon>
-                      )}{" "}
-                    </TableCell>
-                    <TableCell style={{ width: 10 }} align="left">
-                      {" "}
-                      {row.jobStatus && row.jobStatus === "Completed" ? (
-                        <Icon sx={{ color: blue[500] }}>folder</Icon>
-                      ) : (
-                        <Icon color="error">folder</Icon>
-                      )}{" "}
-                    </TableCell>
-                    <TableCell style={{ width: 200 }} align="left">
-                      {row.jobStatus && row.jobStatus === "Completed" ? (
-                        <SuccessTextTypography>
-                          {row.name}
-                        </SuccessTextTypography>
-                      ) : (
-                        <ErrorTextTypography>{row.name}</ErrorTextTypography>
-                      )}
-                    </TableCell>
-                    <TableCell style={{ width: 800 }} align="right">
-                      {row.owner && row.jobStatus === "Completed" ? (
-                        <SuccessTextTypography>
-                          {" "}
-                          {row.owner}
-                        </SuccessTextTypography>
-                      ) : (
-                        <ErrorTextTypography> {row.owner}</ErrorTextTypography>
-                      )}
-                    </TableCell>
-                    <TableCell style={{ width: 200 }} align="right">
-                      {row.owner && row.jobStatus === "Completed" ? (
-                        <SuccessTextTypography display="inline">
-                          {row.jobStatus}
-                          <NormalTextTypography display="inline">
-                            {" on "}
-                          </NormalTextTypography>
-                          {moment(row.endTime).format("MMM D")}
-                        </SuccessTextTypography>
-                      ) : (
-                        <ErrorTextTypography display="inline">
-                          {row.jobStatus}
-                          <NormalTextTypography display="inline">
-                            {" on "}
-                          </NormalTextTypography>
-                          {moment(row.endTime).format("MMM D")}
-                        </ErrorTextTypography>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                </ExpandableTableRow>
-              </>
-            ))}
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+        <TableHead>
+          <TableCell>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <div>
+                <SearchBar
+                  value={searched}
+                  onChange={(searchVal) => requestSearch(searchVal)}
+                  onCancelSearch={() => cancelSearch()}
+                  style={{
+                    margin: "0",
+                    maxWidth: 600,
+                  }}
+                />
+              </div>
+              <div>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                  colSpan={5}
+                  count={rows.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: {
+                      "aria-label": "rows per page",
+                    },
+                    native: true,
+                  }}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                  sx={{ borderBottom: "unset" }}
+                />
+              </div>
+            </div>
+          </TableCell>
+        </TableHead>
+        <TableBody>
+          {rows.length === 0 && (
+            <div style={{ padding: 10 }}>No matching users found!</div>
+          )}
+          {(rowsPerPage > 0
+            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : rows
+          ).map((row) => (
+            <>
+              <ExpandableTableRow key={row.id} data={row}>
+                <TableRow key={row.id}>
+                  <TableCell style={{ width: 10 }} align="left">
+                    {" "}
+                    {row.jobStatus && row.jobStatus === "Completed" ? (
+                      <Icon color="success">check_circle</Icon>
+                    ) : (
+                      <Icon color="error">error</Icon>
+                    )}{" "}
+                  </TableCell>
+                  <TableCell style={{ width: 10 }} align="left">
+                    {" "}
+                    {row.jobStatus && row.jobStatus === "Completed" ? (
+                      <Icon sx={{ color: blue[500] }}>folder</Icon>
+                    ) : (
+                      <Icon color="error">folder</Icon>
+                    )}{" "}
+                  </TableCell>
+                  <TableCell style={{ width: 200 }} align="left">
+                    {row.jobStatus && row.jobStatus === "Completed" ? (
+                      <SuccessTextTypography>{row.name}</SuccessTextTypography>
+                    ) : (
+                      <ErrorTextTypography>{row.name}</ErrorTextTypography>
+                    )}
+                  </TableCell>
+                  <TableCell style={{ width: 800 }} align="right">
+                    {row.owner && row.jobStatus === "Completed" ? (
+                      <SuccessTextTypography>
+                        {" "}
+                        {row.owner}
+                      </SuccessTextTypography>
+                    ) : (
+                      <ErrorTextTypography> {row.owner}</ErrorTextTypography>
+                    )}
+                  </TableCell>
+                  <TableCell style={{ width: 200 }} align="right">
+                    {row.owner && row.jobStatus === "Completed" ? (
+                      <SuccessTextTypography display="inline">
+                        {row.jobStatus}
+                        <NormalTextTypography display="inline">
+                          {" on "}
+                        </NormalTextTypography>
+                        {moment(row.endTime).format("MMM D")}
+                      </SuccessTextTypography>
+                    ) : (
+                      <ErrorTextTypography display="inline">
+                        {row.jobStatus}
+                        <NormalTextTypography display="inline">
+                          {" on "}
+                        </NormalTextTypography>
+                        {moment(row.endTime).format("MMM D")}
+                      </ErrorTextTypography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              </ExpandableTableRow>
+            </>
+          ))}
 
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+          {emptyRows > 0 && (
+            <TableRow style={{ height: 53 * emptyRows }}>
+              <TableCell colSpan={6} />
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
