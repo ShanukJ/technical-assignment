@@ -2,7 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-Live demo available at [technical-assignment](https://technical-assignment.netlify.app/).
+This project was built with [Material Design](https://github.com/mui/material-ui).
+
+Live demo available at [technical-assignment.netlify.app](https://technical-assignment.netlify.app/).
 
 ## Install
 
