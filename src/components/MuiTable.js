@@ -322,7 +322,7 @@ export default function MuiTable() {
         </TableHead>
         <TableBody>
           {rows.length === 0 && (
-            <div style={{ padding: 10 }}>No matching users found!</div>
+            <div style={{ padding: 10 }}>No matching owners found!</div>
           )}
           {(rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
